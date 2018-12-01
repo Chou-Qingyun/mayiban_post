@@ -1,201 +1,220 @@
-<!DCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
+
 <head>
 	<meta charset="UTF-8">
 	<title>爱奇艺超级主播全国网络主播选秀大赛</title>
 	<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,minimum-scale=1.0,user-scalable=no">
 	<link href="__TMPL__/public/assets/css/mobile.css" rel="stylesheet">
-<body>
-	<div id="box">
-		<div class="container">
-			<div class="form-box">
-				<div class="form-title">
-					<h1>报名</h1>
-				</div>
-				<div class="form-content">
-					<form action="" id="mbform" enctype="multipart/form-data" method="post" action="">
-						<input type="text" class="txt validataele-city" name="city" id="city" placeholder="所在城市">
-						<input type="text" class="txt validataele-name" name="name" id="name" placeholder="姓名">
-						<input type="text" class="txt validataele-phone" name="phone" id="phone" placeholder="手机号">
-						<input type="text" class="txt validataele-mailbox" name="mailbox" id="mailbox" placeholder="邮箱">
-						<div class="file validataele-img">
-							<input type="file" name="img" id="img" class='fileupload' accept="image/*" multiple="multiple">
-							<span class="filebtn">上传本人生活照(3张)</span>
-						</div>
-						<p class="img_warning"></p>
-						<div class="file validataele-mv">
-							<input type="file" class="fileupload" name="mv" id="mv">
-							<span class="filebtn">上传个人短视频(1分钟以内)</span>
-						</div>
-						<p class="video_warning"></p>
-                                                <input type="text" class="txt" name="video_path" id="video_path" placeholder="或上传个人短视频链接">
-                                                <p class="video_path_warning"></p>
-						<button id="subBtn" class="submitBtn">提交</button>
-						<p class="submit_warning">*同一个参赛选手不能重复提交作品，如有发现则取消参赛资格</p>
-					</form>
-				</div>
-				
-			</div>
-			
-		</div>
-	</div>	
 
+<body>
+<div id="box">
+	<div class="container">
+		<div class="form-box">
+			<div class="form-title">
+				<h1>报名</h1>
+			</div>
+			<div class="form-content">
+				<form action="" id="mbform" enctype="multipart/form-data" method="post" action="">
+					<input type="text" class="txt validataele-city" name="city" id="city" placeholder="所在城市">
+					<input type="text" class="txt validataele-name" name="name" id="name" placeholder="姓名">
+					<input type="text" class="txt validataele-phone" name="phone" id="phone" placeholder="手机号">
+					<input type="text" class="txt validataele-mailbox" name="mailbox" id="mailbox" placeholder="邮箱">
+					<div class="file validataele-img">
+						<input type="file" name="img" id="img" class='fileupload' accept="image/*" multiple="multiple">
+						<span class="filebtn">上传本人生活照(3张)</span>
+					</div>
+					<p class="img_warning"></p>
+					<div class="file validataele-mv">
+						<input type="file" class="fileupload" name="mv" id="mv">
+						<span class="filebtn">上传个人短视频(1分钟以内)</span>
+					</div>
+					<p class="video_warning"></p>
+					<input type="text" class="txt" name="video_path" id="video_path" placeholder="或上传个人短视频链接">
+					<p class="video_path_warning"></p>
+					<button id="subBtn" class="submitBtn">提交</button>
+					<p class="submit_warning">*同一个参赛选手不能重复提交作品，如有发现则取消参赛资格</p>
+				</form>
+			</div>
+		</div>
+	</div>
+</div>
 <script src="https://cdn.bootcss.com/jquery/2.2.1/jquery.min.js"></script>
 <script src="http://static.runoob.com/assets/jquery-validation-1.14.0/dist/jquery.validate.min.js"></script>
 <script src="http://static.runoob.com/assets/jquery-validation-1.14.0/dist/localization/messages_zh.js"></script>
 <script type="text/javascript">
-$(function(){
-	var imgnum = 0;
-	var imgArr = [];
-	var mvFile = null;
-	var mw = document.documentElement.clientWidth || document.body.clientWidth;
+    $(function() {
+        var imgnum = 0;
+        var imgArr = [];
+        var mvFile = null;
+        var mw = document.documentElement.clientWidth || document.body.clientWidth;
         var mh = document.documentElement.clientHeight || document.body.clientHeight;
         $('#box').width(mw);
         $('#box').height(mh);
         // 检测用户代理获取设备
         var userEngine = navigator.userAgent;
+        console.log(userEngine);
         if (userEngine.indexOf('iPad') !== -1) {
-        	$('.form-box').css({'width':'400px','height':'550px'});
+            $('.form-box').css({ 'width': '400px', 'height': '550px' });
         }
-
-        if (mh <= 568 ) {
-        	$('.form-title').css('margin-top', '10px');
-        	$('.form-title').find('h1').css('font-size', '2rem');
-        	$('.form-content').css('margin-top', '1rem');
-        }
-
-	// 苹果手机端屏蔽上传视频的按钮
+        // 苹果手机端屏蔽上传视频的按钮
         if (userEngine.indexOf('iPhone') !== -1) {
             $('#video_path').attr('placeholder', '上传个人短视频链接');
             $('.validataele-mv').hide();
             $('.video_warning').hide();
         }
-
+        if (mh <= 568) {
+            $('.form-title').css('margin-top', '10px');
+            $('.form-title').find('h1').css('font-size', '2rem');
+            $('.form-content').css('margin-top', '1rem');
+        }
         // 添加自定义验证
-        jQuery.validator.addMethod("isphone", function(value, element) {   
-		    var tel = /^\d{11}$/;
-		    return this.optional(element) || (tel.test(value));
-		}, "请正确填写您的手机号");
+        jQuery.validator.addMethod("isphone", function(value, element) {
+            var tel = /^\d{11}$/;
+            return this.optional(element) || (tel.test(value));
+        }, "请正确填写您的手机号");
         // 表单验证
         $('#mbform').validate({
-        	errorPlacement: function(error, element) {
-			// Append error within linked label
-				$( element )
-					.closest( "form" )
-						.find( ".validataele-"+ element.attr('id') )
-							.after( error );
-			},
-        	rules: {
-        		name: 'required',
-			city: 'required',
-        		mailbox: {
-        			required: true,
-        			email: true
-        		},
-        		phone: {
-        			required: true,
-        			isphone: true,
-        			remote: {
-        				url: "{:url('portal/Mobile/existsPhone')}",
-        				type: 'post',
-        				dataType: 'json',
-        				data: {
-        					phone: function() {
-        						return $('#phone').val();
-        					}
-        				}
-        			}
-        		},
-        		img: 'required',
-        	},
-        	messages: {
-        		name: '请填写姓名',
-			city: '请填写城市名称',
-        		phone: {
-        			required: '请填写手机号',
-        			isphone: '请填写正确手机号',
-        			remote: '该手机号已被使用，请更换其他手机号'
-
-        		},
-        		mailbox: {
-        			required: '请填写邮箱',
-        			email: '请填写正确的邮箱'
-        		},
-        		img: '请上传3张图片',
-        	},
-        	submitHandler:function(form){
-                        var video_path = $('#video_path').val();
-                        var urlRegx = /^([hH][tT]{2}[pP]:\/\/|[hH][tT]{2}[pP][sS]:\/\/).*$/;
-                        if (video_path !== '' && !urlRegx.test(video_path)) {
-                             $('.video_path_warning').text('请填写正确视频链接路径').show(); 
-                             return false;
+            errorPlacement: function(error, element) {
+                // Append error within linked label
+                $(element)
+                    .closest("form")
+                    .find(".validataele-" + element.attr('id'))
+                    .after(error);
+            },
+            rules: {
+                city: 'required',
+                name: 'required',
+                mailbox: {
+                    required: true,
+                    email: true
+                },
+                phone: {
+                    required: true,
+                    isphone: true,
+                    remote: {
+                        url: "{:url('portal/Mobile/existsPhone')}",
+                        type: 'post',
+                        dataType: 'json',
+                        data: {
+                            phone: function() {
+                                return $('#phone').val();
+                            }
                         }
-        		var form = document.querySelector('form');
-        		var formData = new FormData(form);
-	    		for(var i = 0;i < imgArr.length;i++){
-        	               formData.append('file[]',imgArr[i]);
-        	        }
-                        var cf = confirm('作品提交之后则不能修改，确认提交？');
-                        if (cf == true) {
-        	                $.ajax({ 
-        			    type: 'post',
-        			    dataType: 'json',
-        			    contentType: false, 
-        			    processData: false,
-        			    url: "{:url('portal/Mobile/addData')}",
-        			    data: formData,
-        			    beforeSend: function(){
-        			    	$('#subBtn').text('提交中...').attr('disabled','disabled').css('color','#447AEB');
-        			    },
-        			    success: function (response) {
-        			    	if (response.state) {
-        				    	$('#subBtn').text(response.succ).attr('disabled','disabled').css('color','#669900');
-        			    	} else if (response.state === false) {
-        			    		$('.validataele-mv').find('p').text(response.errormsg).show();
-        			    		$('#subBtn').text('请刷新后重试').attr('disabled', 'disabled').css('color', '#ec8b8b');
-        			    	}
-        			    }
-        			});
-                        }
-        		return false;
-	        }    
+                    }
+                },
+                img: 'required',
+            },
+            messages: {
+                city: '请填写城市名称',
+                name: '请填写姓名',
+                phone: {
+                    required: '请填写手机号',
+                    isphone: '请填写正确手机号',
+                    remote: '该手机号已被使用，请更换其他手机号'
+                },
+                mailbox: {
+                    required: '请填写邮箱',
+                    email: '请填写正确的邮箱'
+                },
+                img: '请上传3张图片',
+            },
+            submitHandler: function(form) {
+                var video_path = $('#video_path').val();
+                var urlRegx = /^([hH][tT]{2}[pP]:\/\/|[hH][tT]{2}[pP][sS]:\/\/).*$/;
+                if (video_path !== '' && !urlRegx.test(video_path)) {
+                    $('.video_path_warning').text('请填写正确视频链接路径').show();
+                    return false;
+                }
+                var form = document.querySelector('form');
+                var formData = new FormData(form);
+                var cf = confirm('作品提交之后则不能修改，确认提交？');
+                if (cf == true) {
+                    var imgStr = '';
+                    var index = 1;
+                    for (var i = 0; i < imgArr.length; i++) {
+                        console.log(i);
+                        var formdata = new FormData(form);
+                        formdata.append('file', imgArr[i]);
+                        formdata.append('phone', $('#phone').val());
+                        $.ajax({
+                            type: 'post',
+                            dataType: 'json',
+                            contentType: false,
+                            processData: false,
+                            url: "{:url('portal/Mobile/uploadImg')}",
+                            data: formdata,
+                            beforeSend: function() {
+                                $('#subBtn').text('上传图片中...').attr('disabled', 'disabled').css('color', '#447AEB');
+                            },
+                            success: function (res) {
+                                imgStr += res.url + '|';
+                                $('#subBtn').text('图片'+ index +'上传完成').attr('disabled', 'disabled').css('color', '#447AEB');
+                                index++;
+                                if (index > 3) {
+                                    formData.append('pictures', imgStr);
+                                    $.ajax({
+                                        type: 'post',
+                                        dataType: 'json',
+                                        contentType: false,
+                                        processData: false,
+                                        url: "{:url('portal/Mobile/addData')}",
+                                        data: formData,
+                                        beforeSend: function() {
+                                            $('#subBtn').text('提交中...').attr('disabled', 'disabled').css('color', '#447AEB');
+                                        },
+                                        success: function(response) {
+                                            if (response.state) {
+                                                $('#subBtn').text(response.succ).attr('disabled', 'disabled').css('color', '#669900');
+                                            } else if (response.state === false) {
+                                                $('.validataele-mv').find('p').text(response.errormsg).show();
+                                                $('#subBtn').text('请刷新后重试').attr('disabled', 'disabled').css('color', '#ec8b8b');
+                                            }
+                                        }
+                                    });
+                                }
+                            }
+                        });
+                    }
+                    return false;
+                }
+                return false;
+            }
         });
         // 上传图片
         $('input[name="img"]').change(function() {
-        	imgnum += this.files.length;
-        	if (imgnum > 3) {
-        		$(this).parent().css('border','1px solid #ec8b8b').nextAll('p.img_warning').text('图片最多只能上传3张,请重新上传3张').show();
-        		imgnum = 0;
-        		return false;
-        	} else {
-        		for(var i=0; i < this.files.length; i++) {
-        			imgArr.push(this.files[i]);
-        		}
-
-        		if (imgnum < 3) {
-        			$(this).parent().css('border','1px solid #ec8b8b').nextAll('p.img_warning').text('请提供3张图片,还需上传'+ (3-parseInt(imgnum)) +'张').show();
-        		} else {
-	        		$(this).parent().css('border','1px solid transparent').nextAll('p.img_warning').css('color', '#a0ea0a').text('3张图片选择完成').show();
-        		}
-        		
-        	}
+            imgnum += this.files.length;
+            if (imgnum > 3) {
+                $(this).parent().css('border', '1px solid #ec8b8b').nextAll('p.img_warning').text('图片最多只能上传3张,请重新上传3张').show();
+                imgnum = 0;
+                return false;
+            } else {
+                for (var i = 0; i < this.files.length; i++) {
+                    imgArr.push(this.files[i]);
+                }
+                if (imgnum < 3) {
+                    $(this).parent().css('border', '1px solid #ec8b8b').nextAll('p.img_warning').text('请提供3张图片,还需上传' + (3 - parseInt(imgnum)) + '张').show();
+                } else {
+                    $(this).parent().css('border', '1px solid transparent').nextAll('p.img_warning').css('color', '#a0ea0a').text('3张图片选择完成').show();
+                }
+            }
         });
         // 上传视频
         $('#mv').change(function() {
-        	var videofile = this.files[0];
-        	// 只支持MP4
-        	if (videofile.type.indexOf('video/mp4') === -1) {
-        		$(this).parent().css('border','1px solid #ec8b8b').nextAll('p.video_warning').text('只支持上传mp4格式的视频').show();
-        		return false;
-        	} else if (parseInt(videofile.size) > 209715200) {
-        		$(this).parent().css('border','1px solid #ec8b8b').nextAll('p.video_warning').text('上传视频不能超过200M').show();
-        		return false;
-        	}
-        	$(this).parent().css('border', '1px solid transparent').nextAll('p.video_warning').css('color', '#a0ea0a').text('视频选择完成').show();
-        	mvFile = this.files[0];
+            var videofile = this.files[0];
+            // 只支持MP4
+            if (videofile.type.indexOf('video/mp4') === -1) {
+                $(this).parent().css('border', '1px solid #ec8b8b').nextAll('p.video_warning').text('只支持上传mp4格式的视频').show();
+                return false;
+            } else if (parseInt(videofile.size) > 209715200) {
+                $(this).parent().css('border', '1px solid #ec8b8b').nextAll('p.video_warning').text('上传视频不能超过200M').show();
+                return false;
+            }
+            $(this).parent().css('border', '1px solid transparent').nextAll('p.video_warning').css('color', '#a0ea0a').text('视频选择完成').show();
+            mvFile = this.files[0];
         });
-});
+    });
 </script>
 </body>
-</html>
 
+</html>

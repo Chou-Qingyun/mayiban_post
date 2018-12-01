@@ -189,8 +189,57 @@ class MobileController extends HomeBaseController
         } else {
             return json(array('state'=>false, 'errormsg'=> '提交失败，请稍候再试'));
         }
-
     }
+
+    public function postData() {
+        $data = Request::instance()->post();
+        $postData['city'] = $data['city'];
+        $postData['name'] = $data['name'];
+        $postData['phone'] = $data['phone'];
+        $postData['mailbox'] = $data['mailbox'];
+        $postData['pictures'] = $data['img_arr'];
+        $postData['video'] = $data['mv_path'];
+        $postData['video_path'] = $data['video_path'];
+
+        $rule = [
+            'name' => 'require|max: 25',
+            'city' => 'require',
+            'phone' => 'require|regex:\d{11}|unique:user_resource',
+            'mailbox' => 'require|email'
+        ];
+
+        $msg = [
+            'name.require' => '请填写姓名',
+            'city.require' => '请填写城市名称',
+            'name.max' => '姓名最多不能超过25个字符',
+            'phone.require' => '请填写手机号',
+            'phone.regex' => '请使用正确的手机号',
+            'phone.unique' => '该手机号已被使用，请更换其他手机号',
+            'mailbox.require' => '请填写邮箱',
+            'mailbox.email' => '请填写正确的邮箱'
+        ];
+
+        if ($postData['video_path']) {
+            $rule['video_path'] = 'url';
+            $msg['video_path.url'] = '请填写正确的视频链接地址';
+        }
+
+        $validate = new Validate($rule, $msg);
+
+        if (!$validate->check($postData)) {
+            $resopnseMsg['state'] = false;
+            $resopnseMsg['errormsg'] = $validate->getError();
+            return json($resopnseMsg);
+        }
+        $postData['create_time'] = time();
+        $res = Db::name('user_resource')->insert($postData);
+        if ($res) {
+            return json(array('state'=>true,'succ'=>'提交成功'));
+        } else {
+            return json(array('state'=>false, 'errormsg'=> '提交失败，请稍候再试'));
+        }
+
+	}
 
 	
 

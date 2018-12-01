@@ -28,3 +28,16 @@ CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
 LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN
 ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 POSSIBILITY OF SUCH DAMAGE.
+
+如果git push错误
+解决方案：
+vim .git/config
+
+修改
+
+[remote "origin"]
+	url = https://github.com/wangz/example.git
+为：
+[remote "origin"]
+	url = https://wangz@github.com/wangz/example.git
+再次git push，弹出框输入密码，即可提交
