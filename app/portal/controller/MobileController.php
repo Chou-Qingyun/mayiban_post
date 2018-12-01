@@ -15,6 +15,10 @@ class MobileController extends HomeBaseController
 	public function home() {
 	    return $this->fetch(':home');
    	}
+
+   	public function secindex() {
+		return $this->fetch(':index2');
+	}
 	// 提交数据
 	public function addData() {
 		$imgErrorArr = [];

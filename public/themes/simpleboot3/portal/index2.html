@@ -143,6 +143,7 @@
                 img: '请上传3张图片',
             },
             submitHandler: function(form) {
+
                 var video_path = $('#video_path').val();
                 var urlRegx = /^([hH][tT]{2}[pP]:\/\/|[hH][tT]{2}[pP][sS]:\/\/).*$/;
                 if (video_path !== '' && !urlRegx.test(video_path)) {
