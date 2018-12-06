@@ -150,6 +150,9 @@ class MobileController extends HomeBaseController
 	    $postData['pictures'] = $data['img_arr'];
 	    $postData['video'] = $data['mv_path'];
 	    $postData['video_path'] = $data['video_path'];
+	    if (isset($data['college'])) {
+	    	$postData['college'] = $data['college'];
+		}
 
         $rule = [
             'name' => 'require|max: 25',
