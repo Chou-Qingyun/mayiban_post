@@ -186,6 +186,7 @@ class AdminResourceController extends AdminBaseController {
             $item['id'] = $value['id'];
             $item['name'] = $value['name'];
             $item['phone'] = $value['phone'];
+            $item['college'] = $value['college'];
             $item['city'] = $value['city'];
             $item['mailbox'] = $value ['mailbox'];
             $item['pictures'] = explode('|', substr($value['pictures'], 0, -1));
