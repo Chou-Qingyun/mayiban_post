@@ -148,8 +148,13 @@ class MobileController extends HomeBaseController
 	    $postData['phone'] = $data['phone'];
 	    $postData['mailbox'] = $data['mailbox'];
 	    $postData['pictures'] = $data['img_arr'];
-	    $postData['video'] = $data['mv_path'];
-	    $postData['video_path'] = $data['video_path'];
+
+	    if (empty($data['mv_path'])) {
+            $postData['video_path'] = $data['video_path'];
+		} else {
+            $postData['video'] = $data['mv_path'];
+		}
+
 	    if (isset($data['college'])) {
 	    	$postData['college'] = $data['college'];
 		}

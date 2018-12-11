@@ -175,6 +175,7 @@
                             if (response.state) {
                                 $('#subBtn').text(response.succ).attr('disabled', 'disabled').css('color', '#669900');
                             } else if (response.state === false) {
+                                alert(response.errormsg);
                                 $('.validataele-mv').find('p').text(response.errormsg).show();
                                 $('#subBtn').text('请刷新后重试').attr('disabled', 'disabled').css('color', '#ec8b8b');
                             }
