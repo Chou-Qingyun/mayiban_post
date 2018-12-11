@@ -172,10 +172,12 @@ class MobileController extends HomeBaseController
             'mailbox.email' => '请填写正确的邮箱'
         ];
 
+		/*
 		if ($postData['video_path']) {
             $rule['video_path'] = 'url';
             $msg['video_path.url'] = '请填写正确的视频链接地址';
         }
+		*/
 
 		$validate = new Validate($rule, $msg);
 
@@ -221,11 +223,12 @@ class MobileController extends HomeBaseController
             'mailbox.require' => '请填写邮箱',
             'mailbox.email' => '请填写正确的邮箱'
         ];
-
+		/*
         if ($postData['video_path']) {
             $rule['video_path'] = 'url';
             $msg['video_path.url'] = '请填写正确的视频链接地址';
         }
+		*/
 
         $validate = new Validate($rule, $msg);
 
