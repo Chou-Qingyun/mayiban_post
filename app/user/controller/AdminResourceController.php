@@ -200,7 +200,7 @@ class AdminResourceController extends AdminBaseController {
         $this->assign('list', $arr);
         $this->assign('page', $page);
         // 渲染模板输出
-        return $this->fetch('../admin/resource:home');
+        return $this->fetch('../admin/resource:index');
 
     }
 
