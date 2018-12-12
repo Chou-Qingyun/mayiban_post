@@ -21,7 +21,7 @@ class MobileController extends HomeBaseController
 	}
 
     public function match() {
-        return $this->fetch(':match');
+        return $this->fetch(':match1');
     }
 	// 提交数据
 	public function addData() {
