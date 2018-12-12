@@ -162,48 +162,6 @@ class AdminResourceController extends AdminBaseController {
 
     }
 
-    public function homeList() {
-        $where   = [];
-        $where['post_from'] = 1;
-        $request = input('request.');
-
-        if (!empty($request['uid'])) { // 用户ID
-            $where['id'] = intval($request['uid']);
-        }
-        $keywordComplex = [];
-        if (!empty($request['keyword'])) {  // 关键字 用户名/邮箱/手机
-            $keyword = $request['keyword'];
-
-            $keywordComplex['name|mailbox|phone']    = ['like', "%$keyword%"];
-
-        }
-        // 用户资源表
-        $usersQuery = Db::name('user_resource');
-
-        $list = $usersQuery->whereOr($keywordComplex)->where($where)->order("create_time DESC")->paginate(10);
-        $arr = [];
-        foreach($list as $value) {
-            $item['id'] = $value['id'];
-            $item['name'] = $value['name'];
-            $item['phone'] = $value['phone'];
-            $item['college'] = $value['college'];
-            $item['city'] = $value['city'];
-            $item['mailbox'] = $value ['mailbox'];
-            $item['pictures'] = explode('|', substr($value['pictures'], 0, -1));
-            $item['video'] = $value['video'];
-            $item['create_time'] = $value['create_time'];
-            $item['video_path'] = $value['video_path'];
-            $arr[] = $item;
-        }
-
-        // 获取分页显示
-        $page = $list->render();
-        $this->assign('list', $arr);
-        $this->assign('page', $page);
-        // 渲染模板输出
-        return $this->fetch('../admin/resource:index');
-
-    }
 
 }
 
