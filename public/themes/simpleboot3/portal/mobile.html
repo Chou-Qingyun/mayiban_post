@@ -149,6 +149,14 @@
                     $('.video_path_warning').text('请填写正确视频链接路径').show();
                     return false;
                 }
+
+                var img_num = $('#img_arr').attr('data-sum');
+                var img_left = 3 - parseInt(img_num);
+                if (img_left > 0) {
+                    alert('还需上传'+ img_left + '张图片');
+                    return false;
+                }
+
                 var form = document.querySelector('form');
                 var formData = new FormData(form);
 

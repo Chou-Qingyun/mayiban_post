@@ -21,93 +21,18 @@ class MobileController extends HomeBaseController
 	}
 
     public function match() {
-        return $this->fetch(':match1');
+        return $this->fetch(':match');
     }
-	// 提交数据
-	public function addData() {
-		$imgErrorArr = [];
-		$postData = Request::instance()->post();
-		// 表单后台数据再次验证
-		$video_path = Request::instance()->post('video_path');
-		$rule = [
-			'name' => 'require|max: 25',
-			'phone' => 'require|regex:\d{11}|unique:user_resource',
-			'mailbox' => 'require|email',
-			'city' => 'require'
-		];
-
-		$msg = [
-			'name.require' => '请填写姓名',
-			'name.max' => '姓名最多不能超过25个字符',
-			'phone.require' => '请填写手机号',
-			'phone.regex' => '请使用正确的手机号',
-			'phone.unique' => '该手机号已被使用，请更换其他手机号',
-			'mailbox.require' => '请填写邮箱',
-			'mailbox.email' => '请填写正确的邮箱',
-			'city.require' => '请填写城市名称'
-		];
-
-		if ($video_path) {
-			$rule['video_path'] = 'url';
-			$msg['video_path.url'] = '请填写正确的视频链接地址';
-		}
-
-		$validate = new Validate($rule, $msg);
-
-		if (!$validate->check($postData)) {
-			$resopnseMsg['state'] = false;
-			$resopnseMsg['errormsg'] = $validate->getError();
-			return json($resopnseMsg);
-		}
-
-		$phoneNum = Request::instance()->post('phone');
-		/*
-		// 上传图片
-		$imgFile = Request::instance()->file('file');
-		foreach($imgFile as $file) {
-		@mkdir(ROOT_PATH.'/public/upload/'.date('Y-m-d', time()).'/'.$phoneNum, 0777,true);
-		@chmod(ROOT_PATH.'/public/upload/'.date('Y-m-d', time()).'/'.$phoneNum, 0777);
-			// 移动到对应手机号的文件夹下
-			$resInfo = $this->uploadFile($file, $phoneNum);
-			if ($resInfo['state']) {
-				$imgFileArr[] = $resInfo['upload_path'];
-				@chmod(ROOT_PATH.'/public/upload/'.date('Y-m-d', time()), 0777);
-			} else {
-				$imgErrorArr = $resInfo;
-				break;
-			}
-		}
-		if (!empty($imgErrorArr)) {
-			return json($imgErrorArr);
-		}*/
-		// 上传视频
-		$videoFile = Request::instance()->file('mv');
-		if ($videoFile) {
-			$mvRes = $this->uploadFile($videoFile, $phoneNum);
-			if ($mvRes['state']) {
-				$mvFilePath = $mvRes['upload_path'];
-			} else {
-				return json($mvRes);
-			}
-			$postData['video'] = $mvFilePath;
-			//如果有传视频，则不存链接路径
-			$postData['video_path'] = '';
-		}
-
-		//存入表单
-		$postData['create_time'] = time();
-		$res = Db::name('user_resource')->insert($postData);
-		if ($res) {
-			return json(array('state'=>true,'succ'=>'提交成功'));
-		} else {
-			return json(array('state'=>false, 'errormsg'=> '提交失败，请稍候再试'));
-		}
-	}
 
 	// 电竞报名提交数据
     public function addGameData() {
-        $imgErrorArr = [];
-        $postData = Request::instance()->post();
+        $data = Request::instance()->post();
+        $postData['name'] = $data['name'];
+        $postData['phone'] = $data['phone'];
+        $postData['weixin'] = $data['weixin'];
+        $postData['city'] = $data['city'];
+        $postData['game_name'] = $data['game_name'];
+        $postData['pictures'] = $data['img_arr'];
         $rule = [
             'name' => 'require|max: 25',
             'phone' => 'require|regex:\d{11}|unique:user_resource',
@@ -122,8 +47,6 @@ class MobileController extends HomeBaseController
             'phone.require' => '请填写手机号',
             'phone.regex' => '请使用正确的手机号',
             'phone.unique' => '该手机号已被使用，请更换其他手机号',
-            'mailbox.require' => '请填写邮箱',
-            'mailbox.email' => '请填写正确的邮箱',
             'weixin.require'=> '请填写微信号',
             'game_name.require'=> '请填写擅长游戏',
             'city.require' => '请填写城市名称'
@@ -137,8 +60,6 @@ class MobileController extends HomeBaseController
             $resopnseMsg['errormsg'] = $validate->getError();
             return json($resopnseMsg);
         }
-
-        $phoneNum = Request::instance()->post('phone');
 
         //存入表单
         $postData['create_time'] = time();
@@ -228,12 +149,6 @@ class MobileController extends HomeBaseController
             'mailbox.email' => '请填写正确的邮箱'
         ];
 
-		/*
-		if ($postData['video_path']) {
-            $rule['video_path'] = 'url';
-            $msg['video_path.url'] = '请填写正确的视频链接地址';
-        }
-		*/
 
 		$validate = new Validate($rule, $msg);
 

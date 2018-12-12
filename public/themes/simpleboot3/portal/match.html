@@ -6,7 +6,11 @@
     <title>爱奇艺超级主播全国网络主播选秀大赛</title>
     <meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,minimum-scale=1.0,user-scalable=no">
     <link href="__TMPL__/public/assets/css/mobile2.css" rel="stylesheet">
-
+    <style>
+        input.validataele-college::-webkit-input-placeholder {
+            font-size: 16px;
+        }
+    </style>
 <body>
 <div id="box">
     <div class="container">
@@ -22,10 +26,12 @@
                     <input type="text" class="txt validataele-city" name="city" id="city" placeholder="所在城市">
                     <input type="text" class="txt validataele-game_name" name="game_name" id="game_name" placeholder="擅长游戏">
                     <div class="file validataele-img">
-                        <input type="file" name="img" id="img" class='fileupload' accept="image/*" multiple="multiple">
-                        <span class="filebtn">上传本人生活照(3张)</span>
+                        <input type="file" name="img" id="img" class='fileupload' accept="image/*">
+                        <span class="filebtn imgupload">上传本人生活照(3张)</span>
+                        <input type="hidden" id="img_arr" name="img_arr" value="" data-sum="0">
+                        <div class="progress_bg"><div class="progress_thumb"></div></div>
                     </div>
-                    <p class="video_path_warning"></p>
+                    <p class="img_warning"></p>
                     <button id="subBtn" class="submitBtn">提交</button>
                     <p class="submit_warning">*同一个参赛选手不能重复提交作品，如有发现则取消参赛资格</p>
                 </form>
@@ -38,6 +44,23 @@
 <script src="http://static.runoob.com/assets/jquery-validation-1.14.0/dist/localization/messages_zh.js"></script>
 <script type="text/javascript">
     $(function() {
+        var xhrOnProgress=function(fun) {
+            xhrOnProgress.onprogress = fun; //绑定监听
+            //使用闭包实现监听绑
+            return function() {
+                //通过$.ajaxSettings.xhr();获得XMLHttpRequest对象
+                var xhr = $.ajaxSettings.xhr();
+                //判断监听函数是否为函数
+                if (typeof xhrOnProgress.onprogress !== 'function')
+                    return xhr;
+                //如果有监听函数并且xhr对象支持绑定时就把监听函数绑定上去
+                if (xhrOnProgress.onprogress && xhr.upload) {
+                    xhr.upload.onprogress = xhrOnProgress.onprogress;
+                }
+                return xhr;
+            }
+        };
+
         var imgnum = 0;
         var imgArr = [];
         var mvFile = null;
@@ -56,11 +79,13 @@
             $('.validataele-mv').hide();
             $('.video_warning').hide();
         }
+
         if (mh <= 568) {
             $('.form-title').css('margin-top', '10px');
             $('.form-title').find('h1').css('font-size', '2rem');
             $('.form-content').css('margin-top', '1rem');
         }
+
         // 添加自定义验证
         jQuery.validator.addMethod("isphone", function(value, element) {
             var tel = /^\d{11}$/;
@@ -99,88 +124,108 @@
             messages: {
                 city: '请填写城市名称',
                 name: '请填写姓名',
+                weixin: '请填写微信号',
+                game_name: '请填写擅长的游戏',
                 phone: {
                     required: '请填写手机号',
                     isphone: '请填写正确手机号',
                     remote: '该手机号已被使用，请更换其他手机号'
+
                 },
-                weixin: '请填写微信号',
-                game_name: '请填写擅长的游戏',
                 img: '请上传3张图片',
             },
             submitHandler: function(form) {
                 var form = document.querySelector('form');
                 var formData = new FormData(form);
+                var img_num = $('#img_arr').attr('data-sum');
+                var img_left = 3 - parseInt(img_num);
+                if (img_left > 0) {
+                    alert('还需上传'+ img_left + '张图片');
+                    return false;
+                }
+
                 var cf = confirm('作品提交之后则不能修改，确认提交？');
                 if (cf == true) {
-                    var imgStr = '';
-                    var index = 1;
-                    for (var i = 0; i < imgArr.length; i++) {
-                        console.log(i);
-                        var formdata = new FormData(form);
-                        formdata.append('file', imgArr[i]);
-                        formdata.append('phone', $('#phone').val());
-                        $.ajax({
-                            type: 'post',
-                            dataType: 'json',
-                            contentType: false,
-                            processData: false,
-                            url: "{:url('portal/Mobile/uploadImg')}",
-                            data: formdata,
-                            beforeSend: function() {
-                                $('#subBtn').text('上传图片中...').attr('disabled', 'disabled').css('color', '#447AEB');
-                            },
-                            success: function (res) {
-                                imgStr += res.url + '|';
-                                $('#subBtn').text('图片'+ index +'上传完成').attr('disabled', 'disabled').css('color', '#447AEB');
-                                index++;
-                                if (index > 3) {
-                                    formData.append('pictures', imgStr);
-                                    $.ajax({
-                                        type: 'post',
-                                        dataType: 'json',
-                                        contentType: false,
-                                        processData: false,
-                                        url: "{:url('portal/Mobile/addGameData')}",
-                                        data: formData,
-                                        beforeSend: function() {
-                                            $('#subBtn').text('提交中...').attr('disabled', 'disabled').css('color', '#447AEB');
-                                        },
-                                        success: function(response) {
-                                            if (response.state) {
-                                                $('#subBtn').text(response.succ).attr('disabled', 'disabled').css('color', '#669900');
-                                            } else if (response.state === false) {
-                                                $('.validataele-mv').find('p').text(response.errormsg).show();
-                                                $('#subBtn').text('请刷新后重试').attr('disabled', 'disabled').css('color', '#ec8b8b');
-                                            }
-                                        }
-                                    });
-                                }
+                    $.ajax({
+                        type: 'post',
+                        dataType: 'json',
+                        contentType: false,
+                        processData: false,
+                        url: "{:url('portal/Mobile/addGameData')}",
+                        data: formData,
+                        beforeSend: function() {
+                            $('#subBtn').text('提交中...').attr('disabled', 'disabled').css('color', '#447AEB');
+                        },
+                        success: function(response) {
+                            if (response.state) {
+                                $('#subBtn').text(response.succ).attr('disabled', 'disabled').css('color', '#669900');
+                            } else if (response.state === false) {
+                                alert(response.errormsg);
+                                $('.validataele-mv').find('p').text(response.errormsg).show();
+                                $('#subBtn').text('请刷新后重试').attr('disabled', 'disabled').css('color', '#ec8b8b');
                             }
-                        });
-                    }
+                        }
+                    });
                     return false;
+
+
                 }
                 return false;
             }
         });
         // 上传图片
-        $('input[name="img"]').change(function() {
-            imgnum += this.files.length;
-            if (imgnum > 3) {
-                $(this).parent().css('border', '1px solid #ec8b8b').nextAll('p.img_warning').text('图片最多只能上传3张,请重新上传3张').show();
-                imgnum = 0;
+        $('#img').change(function() {
+            var phone_num = $('#phone').val();
+            phone_num = phone_num.trim();
+            if (phone_num === '') {
+                $(this).parent().css('border', '1px solid #ec8b8b').nextAll('p.img_warning').text('请先填写手机号').show();
+                $('#phone').focus();
                 return false;
-            } else {
-                for (var i = 0; i < this.files.length; i++) {
-                    imgArr.push(this.files[i]);
-                }
-                if (imgnum < 3) {
-                    $(this).parent().css('border', '1px solid #ec8b8b').nextAll('p.img_warning').text('请提供3张图片,还需上传' + (3 - parseInt(imgnum)) + '张').show();
-                } else {
-                    $(this).parent().css('border', '1px solid transparent').nextAll('p.img_warning').css('color', '#a0ea0a').text('3张图片选择完成').show();
-                }
             }
+            var total_num = $('#img_arr').attr('data-sum');
+            if (parseInt(total_num) == 3) {
+                $(this).parent().css('border', '1px solid #ec8b8b').nextAll('p.img_warning').text('图片最多只能上传3张').show();
+                return false;
+            }
+            var fileObj = document.getElementById('img').files[0];
+            if (fileObj === undefined) {
+                return false;
+            }
+            $('.imgupload').html('上传图片中...').css({'background-color': 'transparent', 'color': '#fff'});
+            $('.progress_bg').show();
+            var formFile = new FormData();
+            formFile.append("file", fileObj);
+            formFile.append("phone", phone_num);
+            $.ajax({
+                url: "{:url('portal/Mobile/uploadImg')}",
+                data: formFile,
+                type: 'post',
+                cache: false,
+                processData: false,
+                contentType: false,
+                xhr:xhrOnProgress(function(e){
+                    var percent = (e.loaded/e.total) * 100;
+                    var percent = parseInt(percent);
+                    $('.progress_thumb').css('width', percent + '%');
+                }),
+                success: function(res){
+                    $('.progress_bg').hide();
+                    $('.progress_thumb').width(0);
+                    var num = $('#img_arr').attr('data-sum');
+                    var img_str = $('#img_arr').val();
+                    img_str += res.url + '|';
+                    num++;
+                    $('#img_arr').attr('data-sum', num);
+                    $('#img_arr').val(img_str);
+                    $('.imgupload').text('图片'+num+'上传完成').css({'background-color': 'rgba(255, 255, 255, 0.8)', 'color': '#636060'});
+                    if (num < 3) {
+                        $('.validataele-img').css('border', '1px solid #ec8b8b').nextAll('p.img_warning').text('请提供3张图片,还需上传' + (3 - parseInt(num)) + '张').show();
+                    } else {
+                        $('.validataele-img').css('border', '1px solid transparent').nextAll('p.img_warning').css('color', '#a0ea0a').text('3张图片选择完成').show();
+                    }
+                }
+            });
+
         });
     });
 </script>
