@@ -1,0 +1,252 @@
+<include file="public@header"/>
+<style type="text/css">
+    .dis{width:100%; height:100%; position: absolute; top:0; left:0;  background:rgba(0,0,0,0.8); display: none;}
+    .thumsource{width:100%; height:100%; display: block; position: absolute; top:0; left:0;}
+    .showImg{position: relative; top:30%; left:35%; width:30%; height:40%; z-index: 100;}
+    .showImg img{position: absolute; top:0; left:0; width:100%; height:100%; border:2px solid #fff;}
+    .back{font-size:40px; text-align:center; line-height:100px; width:50px; height:100px; background:#fff;  position: absolute; left:10%; top:45%; z-index: 100;}
+    .next{font-size:40px; text-align:center; line-height:100px; width:50px; height:100px; background:#fff;  position: absolute; right:10%; top:45%; z-index: 100;}
+    .back,.next {text-decoration: none !important;}
+    .btn-group button { margin-right: 10px; }
+</style>
+<link rel="stylesheet" type="text/css" href="__STATIC__/install/css/video.css"/>
+</head>
+<body>
+<div class="wrap">
+    <ul class="nav nav-tabs">
+        <li class="active"><a>{:lang('USER_INDEXADMIN_INDEX')}</a></li>
+    </ul>
+    <form class="well form-inline margin-top-20" method="post" action="{:url('user/userResource/indexList')}">
+        用户ID：
+        <input class="form-control" type="text" name="uid" style="width: 200px;" value="{:input('request.uid')}"
+               placeholder="请输入用户ID">
+        关键字：
+        <input class="form-control" type="text" name="keyword" style="width: 200px;" value="{:input('request.keyword')}"
+               placeholder="用户名/邮箱/手机">
+        <input type="submit" class="btn btn-primary" value="搜索"/>
+        <a class="btn btn-danger" href="{:url('user/userResource/indexList')}">清空</a>
+    </form>
+    <form method="post" class="js-ajax-form">
+        <table class="table table-hover table-bordered">
+            <thead>
+            <tr>
+                <th></th>
+                <th>ID</th>
+                <th>姓名</th>
+                <th>所在城市</th>
+                <th>推荐/所在院校</th>
+                <th>手机号</th>
+                <th>邮箱</th>
+                <th>图片</th>
+                <th>视频</th>
+                <th>上传时间</th>
+            </tr>
+            </thead>
+            <tbody>
+            <php>
+                $user_statuses=array("0"=>lang('USER_STATUS_BLOCKED'),"1"=>lang('USER_STATUS_ACTIVATED'),"2"=>lang('USER_STATUS_UNVERIFIED'));
+            </php>
+            <foreach name="list" item="vo">
+                <tr>
+                    <td><input type="checkbox" name="playerNo" class="playerNo" value="{$vo.id}"></td>
+                    <td>{$vo.id}</td>
+                    <td>{$vo.name ? $vo.name : lang('NOT_FILLED')}</td>
+                    <td>{$vo.city}</td>
+                    <td>{$vo.college ? $vo.college : '无'}</td>
+                    <td>{$vo.phone ? $vo.phone : lang('NOT_FILLED')}</td>
+                    <td>{$vo.mailbox ? $vo.mailbox : lang('NOT_FILLED')}</td>
+                    <td>
+                        <if condition="!empty($vo.pictures)">
+                            <div class="ban" id ="ban">
+                                <span><a class="showimg" href="javascript:(0)" data-id="{$vo.id}">查看图片</a></span>
+                            </div>
+                            <div class="dis" id="dis{$vo.id}">
+                                <div class="showImg">
+                                    <volist name="vo['pictures']" id="item">
+                                        <span max-width="1600"><img src="{:cmf_get_image_url($item)}" title="点击查看原图"></span>
+                                    </volist>
+                                </div>
+                                <a href="###" class="back" data-id="{$vo.id}"><</a>
+                                <a href="###" class="next" data-id="{$vo.id}">></a>
+                                <span class="thumsource"></span>
+                            </div>
+                            <else/>
+                            暂无图片
+                        </if>
+
+                    </td>
+                    <td>
+                        <if condition="$vo.video neq ''">
+                            <div class="m-video" data-src="{:cmf_get_image_url($vo.video)}"><a href="javascrift:(0)">播放视频</a></div>
+                            <elseif condition="$vo.video_path neq ''" />
+                            <div class=""><a href="{$vo.video_path}" target="_blank">播放视频</a></div>
+                            <else />
+                            <div>暂无视频</div>
+                        </if>
+                    </td>
+                    <td>{:date('Y-m-d H:i:s',$vo['create_time'])}</td>
+                    <!--<td><a href="">查看</a></td>-->
+                </tr>
+            </foreach>
+            </tbody>
+        </table>
+    </form>
+    <div class="btn-group">
+        <button id="selected" class="btn btn-primary">全选</button>
+        <button id="notselected" class="btn btn-warning">取消全选</button>
+        <button id="exportExcel" class="btn btn-success">导出</button>
+        <button id="deleteAct" class="btn btn-danger">删除</button>
+    </div>
+    <div class="pagination">{$page}</div>
+</div>
+<script src="__STATIC__/js/admin.js"></script>
+<script src="__STATIC__/js/jquery-1.11.3.js"></script>
+<script src="__STATIC__/js/pingzi_video.js" type="text/javascript" charset="utf-8"></script>
+<script type="text/javascript">
+    $(function(){
+        // 全选
+        $('#selected').click(function() {
+            $('input[name="playerNo"]').prop({
+                checked: true
+            });
+        });
+        // 取消全选
+        $('#notselected').click(function() {
+            $('input[name="playerNo"]').prop({
+                checked: false
+            })
+        });
+        //导出excel
+        $('#exportExcel').click(function(event) {
+            var idStr = '';
+            $('input[name="playerNo"]').each(function() {
+                if ($(this).prop('checked')) {
+                    idStr += $(this).val() + ',';
+                }
+            });
+            if (idStr === '') {
+                var cf = confirm('确定要导出全部参赛选手信息？');
+                if (cf === true) {
+                    idStr = 'all';
+                } else {
+                    return false;
+                }
+            }
+
+            if (idStr !== '') {
+                $.ajax({
+                    type: 'post',
+                    dataType: 'json',
+                    url: "{:url('user/adminResource/exportExcel')}",
+                    data: { idStr: idStr},
+                    beforeSend: function() {
+                        $('#exportExcel').text('正在导出...').prop({disabled: true});
+                    },
+                    success: function(response) {
+                        $('#exportExcel').text('导出').prop({ disabled: false });
+                        window.open(response.url);
+
+                    }
+
+                });
+            }
+
+        });
+        // 删除
+        $('#deleteAct').click(function() {
+            var idStr = '';
+            $('input[name="playerNo"]').each(function() {
+                if ($(this).prop('checked')) {
+                    idStr += $(this).val() + ',';
+                }
+            });
+            if (idStr === '') {
+                alert('请勾选要删除的选手');
+                return false;
+            }
+
+            if (idStr !== '') {
+                var cf = confirm('确定要删除选手信息？');
+                if (cf === true) {
+                    $.ajax({
+                        type: 'post',
+                        dataType: 'json',
+                        url: "{:url('user/adminResource/deleteAct')}",
+                        data: { idStr: idStr},
+                        beforeSend: function() {
+                            $('#deleteAct').text('正在删除...').prop({disabled: true});
+                        },
+                        success: function(response) {
+                            if (response.state) {
+                                window.location.reload();
+                            } else {
+                                alert(response.errormsg);
+                                return false;
+                            }
+
+                        }
+
+                    });
+                } else {
+                    return false;
+                }
+
+            }
+
+        });
+        $('.showimg').click(function() {
+            $('.dis').hide();
+            var id = $(this).attr('data-id');
+            var disObj = $('#dis'+id);
+            disObj.fadeIn(100);
+            var len = disObj.find('img').length;
+            for(var i=0; i<len; i++){
+                $src = disObj.find('img').eq(i).attr('src');
+                disObj.find('img').eq(i).attr('src',$src);
+                // disObj.find('a').eq(i).attr('href',$src);
+                // console.log( disObj.find('img').eq(i).attr('href',$src))
+            }
+        });
+        //点击上一个
+        $('.back').click(function(){
+            var obj = $('#dis'+$(this).attr('data-id'));
+            var $width = obj.find('img').eq(0).width();
+            obj.find('img').filter(':last').stop().animate({'left':'-'+$width},500,function(){
+                $(this).prependTo(obj.find('.showImg'));
+                $(this).stop().animate({'left':'0'},500);
+            })
+            //div跟着动
+            $('.showImg').stop().animate({'left':'38%'},500,function(){
+                $('.showImg').stop().animate({'left':'35%'},500);
+            });
+        })
+        //点击下一个
+        $('.next').click(function(){
+            var obj = $('#dis' + $(this).attr('data-id'));
+            var $width = obj.find('img').eq(0).width();
+            obj.find('img').filter(':first').stop().animate({'left':$width},500,function(){
+                $(this).appendTo(obj.find('.showImg'));
+                $(this).stop().animate({'left':'0'},500);
+            })
+            //div跟着动
+            $('.showImg').stop().animate({'left':'32%'},500,function(){
+                $('.showImg').stop().animate({'left':'35%'},500);
+            });
+        })
+        //点击空白dis消失
+        $('.thumsource').click(function(){
+            /*$('.dis .showImg').find('img').each(function(){
+                cosole.log($(this).index());
+            });*/
+            $('.dis').fadeOut(100);
+        })
+        $('.dis').find('img').each(function() {
+            $(this).click(function () {
+                window.open($(this).attr('src'));
+            });
+        });
+
+    })
+</script>
+</body>
+</html>

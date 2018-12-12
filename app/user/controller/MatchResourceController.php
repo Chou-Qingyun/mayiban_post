@@ -8,11 +8,11 @@ use PHPExcel_IOFactory;
 use PHPExcel;           //USE phpoffice/phpspreadsheet
 
 
-class UserResourceController extends AdminBaseController {
+class MatchResourceController extends AdminBaseController {
 
     public function indexList() {
         $where   = [];
-        $where['post_from'] = 1;
+        $where['post_from'] = 2;
         $request = input('request.');
 
         if (!empty($request['uid'])) { // 用户ID
@@ -34,13 +34,11 @@ class UserResourceController extends AdminBaseController {
             $item['id'] = $value['id'];
             $item['name'] = $value['name'];
             $item['phone'] = $value['phone'];
-            $item['college'] = $value['college'];
             $item['city'] = $value['city'];
-            $item['mailbox'] = $value ['mailbox'];
+            $item['weixin'] = $value['weixin'];
+            $item['game_name'] = $value['game_name'];
             $item['pictures'] = explode('|', substr($value['pictures'], 0, -1));
-            $item['video'] = $value['video'];
             $item['create_time'] = $value['create_time'];
-            $item['video_path'] = $value['video_path'];
             $arr[] = $item;
         }
 
@@ -49,7 +47,7 @@ class UserResourceController extends AdminBaseController {
         $this->assign('list', $arr);
         $this->assign('page', $page);
         // 渲染模板输出
-        return $this->fetch('../admin/resource:index2');
+        return $this->fetch('../admin/resource:match');
 
     }
 

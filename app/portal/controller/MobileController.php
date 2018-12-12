@@ -19,6 +19,10 @@ class MobileController extends HomeBaseController
    	public function secindex() {
 		return $this->fetch(':index2');
 	}
+
+    public function match() {
+        return $this->fetch(':match');
+    }
 	// 提交数据
 	public function addData() {
 		$imgErrorArr = [];
@@ -99,6 +103,53 @@ class MobileController extends HomeBaseController
 			return json(array('state'=>false, 'errormsg'=> '提交失败，请稍候再试'));
 		}
 	}
+
+	// 电竞报名提交数据
+    public function addGameData() {
+        $imgErrorArr = [];
+        $postData = Request::instance()->post();
+        $rule = [
+            'name' => 'require|max: 25',
+            'phone' => 'require|regex:\d{11}|unique:user_resource',
+            'city' => 'require',
+            'weixin' => 'require',
+            'game_name'=>'require'
+        ];
+
+        $msg = [
+            'name.require' => '请填写姓名',
+            'name.max' => '姓名最多不能超过25个字符',
+            'phone.require' => '请填写手机号',
+            'phone.regex' => '请使用正确的手机号',
+            'phone.unique' => '该手机号已被使用，请更换其他手机号',
+            'mailbox.require' => '请填写邮箱',
+            'mailbox.email' => '请填写正确的邮箱',
+            'weixin.require'=> '请填写微信号',
+            'game_name.require'=> '请填写擅长游戏',
+            'city.require' => '请填写城市名称'
+        ];
+
+
+        $validate = new Validate($rule, $msg);
+
+        if (!$validate->check($postData)) {
+            $resopnseMsg['state'] = false;
+            $resopnseMsg['errormsg'] = $validate->getError();
+            return json($resopnseMsg);
+        }
+
+        $phoneNum = Request::instance()->post('phone');
+
+        //存入表单
+        $postData['create_time'] = time();
+        $postData['post_from'] = 2; // 来自电竞报名
+        $res = Db::name('user_resource')->insert($postData);
+        if ($res) {
+            return json(array('state'=>true,'succ'=>'提交成功'));
+        } else {
+            return json(array('state'=>false, 'errormsg'=> '提交失败，请稍候再试'));
+        }
+    }
 
 	// 验证手机号是否存在
 	public function existsPhone() {
