@@ -22,7 +22,7 @@ class UserResourceController extends AdminBaseController {
         if (!empty($request['keyword'])) {  // 关键字 用户名/邮箱/手机
             $keyword = $request['keyword'];
 
-            $keywordComplex['name|mailbox|phone']    = ['like', "%$keyword%"];
+            $keywordComplex['name|mailbox|phone|college']    = ['like', "%$keyword%"];
 
         }
         // 用户资源表
