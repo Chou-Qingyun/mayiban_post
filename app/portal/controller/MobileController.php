@@ -12,7 +12,9 @@ class MobileController extends HomeBaseController
 		return $this->fetch(':mobile');
 	}
 	
-	public function home() {
+	public function home(Request $request) {
+	    $from_value = $request->get('from') ? $request->get('from') : 1;
+	    $this->assign('from_value', $from_value);
 	    return $this->fetch(':home');
    	}
 
@@ -120,6 +122,7 @@ class MobileController extends HomeBaseController
 	    $postData['phone'] = $data['phone'];
 	    $postData['mailbox'] = $data['mailbox'];
 	    $postData['pictures'] = $data['img_arr'];
+	    $postData['post_from'] = $data['from'];
 
 	    if (empty($data['mv_path'])) {
             $postData['video_path'] = $data['video_path'];
@@ -158,7 +161,6 @@ class MobileController extends HomeBaseController
             return json($resopnseMsg);
         }
         $postData['create_time'] = time();
-        $postData['post_from'] = 1;
         $res = Db::name('user_resource')->insert($postData);
         if ($res) {
             return json(array('state'=>true,'succ'=>'提交成功'));
