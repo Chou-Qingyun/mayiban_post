@@ -13,7 +13,7 @@ class MobileController extends HomeBaseController
 	}
 	
 	public function home(Request $request) {
-	    $from_value = $request->param('from') ? $request->param('from') : 1;
+	    $from_value = $request->get('from') ? $request->get('from') : $request->param('from');
 	    $this->assign('from_value', $from_value);
 	    return $this->fetch(':home');
    	}
