@@ -1,3 +1,4 @@
 /runtime
 install.lock
 !.gitignore
+/conf/database.php
