@@ -56,7 +56,8 @@ class MatchResourceController extends AdminBaseController {
         $postData = Request::instance()->post('idStr');
 
         if ($postData === 'all') {
-            $result = Db::name('user_resource')->order('id desc')->select();
+            $cond['post_from'] = 2;
+            $result = Db::name('user_resource')->where($cond)->order('id desc')->select();
         } else {
             $condition = explode(',', $postData);
             array_pop($condition);

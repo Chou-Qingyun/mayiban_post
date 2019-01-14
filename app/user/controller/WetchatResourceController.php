@@ -22,7 +22,7 @@ class WetchatResourceController extends AdminBaseController {
         if (!empty($request['keyword'])) {  // 关键字 用户名/邮箱/手机
             $keyword = $request['keyword'];
 
-            $keywordComplex['name|mailbox|phone']    = ['like', "%$keyword%"];
+            $keywordComplex['name|mailbox|phone|college']    = ['like', "%$keyword%"];
 
         }
         // 用户资源表
@@ -34,11 +34,13 @@ class WetchatResourceController extends AdminBaseController {
             $item['id'] = $value['id'];
             $item['name'] = $value['name'];
             $item['phone'] = $value['phone'];
+            $item['college'] = $value['college'];
             $item['city'] = $value['city'];
-            $item['weixin'] = $value['weixin'];
-            $item['game_name'] = $value['game_name'];
+            $item['mailbox'] = $value ['mailbox'];
             $item['pictures'] = explode('|', substr($value['pictures'], 0, -1));
+            $item['video'] = $value['video'];
             $item['create_time'] = $value['create_time'];
+            $item['video_path'] = $value['video_path'];
             $arr[] = $item;
         }
 
@@ -47,7 +49,7 @@ class WetchatResourceController extends AdminBaseController {
         $this->assign('list', $arr);
         $this->assign('page', $page);
         // 渲染模板输出
-        return $this->fetch('../admin/resource:match');
+        return $this->fetch('../admin/resource:index2');
 
     }
 
@@ -56,7 +58,8 @@ class WetchatResourceController extends AdminBaseController {
         $postData = Request::instance()->post('idStr');
 
         if ($postData === 'all') {
-            $result = Db::name('user_resource')->order('id desc')->select();
+            $where['post_from'] =3;
+            $result = Db::name('user_resource')->where()->order('id desc')->select();
         } else {
             $condition = explode(',', $postData);
             array_pop($condition);
@@ -162,5 +165,8 @@ class WetchatResourceController extends AdminBaseController {
         }
 
     }
+
+
+
 }
 

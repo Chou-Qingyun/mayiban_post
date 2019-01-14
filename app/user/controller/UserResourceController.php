@@ -58,7 +58,8 @@ class UserResourceController extends AdminBaseController {
         $postData = Request::instance()->post('idStr');
 
         if ($postData === 'all') {
-            $result = Db::name('user_resource')->order('id desc')->select();
+            $con['post_from'] = 1;
+            $result = Db::name('user_resource')->where($con)->order('id desc')->select();
         } else {
             $condition = explode(',', $postData);
             array_pop($condition);
