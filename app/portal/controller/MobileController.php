@@ -22,6 +22,12 @@ class MobileController extends HomeBaseController
 		return $this->fetch(':index2');
 	}
 
+	public function wechat(Request $request) {
+	    $from_value = $request->param('id');
+	    $this->assign('from_value', $from_value);
+	    return $this->fetch(':home');
+    }
+
     public function match() {
         return $this->fetch(':match');
     }
