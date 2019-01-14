@@ -10,9 +10,92 @@ use PHPExcel;           //USE phpoffice/phpspreadsheet
 
 class WetchatResourceController extends AdminBaseController {
 
-    public function indexList() {
+    public function index() {
         $where   = [];
-        $where['post_from'] = 3;
+        $where['post_from'] = 4;
+        $request = input('request.');
+
+        if (!empty($request['uid'])) { // 用户ID
+            $where['id'] = intval($request['uid']);
+        }
+        $keywordComplex = [];
+        if (!empty($request['keyword'])) {  // 关键字 用户名/邮箱/手机
+            $keyword = $request['keyword'];
+
+            $keywordComplex['name|mailbox|phone|college']    = ['like', "%$keyword%"];
+
+        }
+        // 用户资源表
+        $usersQuery = Db::name('user_resource');
+
+        $list = $usersQuery->whereOr($keywordComplex)->where($where)->order("create_time DESC")->paginate(10);
+        $arr = [];
+        foreach($list as $value) {
+            $item['id'] = $value['id'];
+            $item['name'] = $value['name'];
+            $item['phone'] = $value['phone'];
+            $item['college'] = $value['college'];
+            $item['city'] = $value['city'];
+            $item['mailbox'] = $value ['mailbox'];
+            $item['pictures'] = explode('|', substr($value['pictures'], 0, -1));
+            $item['video'] = $value['video'];
+            $item['create_time'] = $value['create_time'];
+            $item['video_path'] = $value['video_path'];
+            $arr[] = $item;
+        }
+
+        // 获取分页显示
+        $page = $list->render();
+        $this->assign('list', $arr);
+        $this->assign('page', $page);
+        // 渲染模板输出
+        return $this->fetch('../admin/resource:index2');
+    }
+    public function index3() {
+        $where   = [];
+        $where['post_from'] = 5;
+        $request = input('request.');
+
+        if (!empty($request['uid'])) { // 用户ID
+            $where['id'] = intval($request['uid']);
+        }
+        $keywordComplex = [];
+        if (!empty($request['keyword'])) {  // 关键字 用户名/邮箱/手机
+            $keyword = $request['keyword'];
+
+            $keywordComplex['name|mailbox|phone|college']    = ['like', "%$keyword%"];
+
+        }
+        // 用户资源表
+        $usersQuery = Db::name('user_resource');
+
+        $list = $usersQuery->whereOr($keywordComplex)->where($where)->order("create_time DESC")->paginate(10);
+        $arr = [];
+        foreach($list as $value) {
+            $item['id'] = $value['id'];
+            $item['name'] = $value['name'];
+            $item['phone'] = $value['phone'];
+            $item['college'] = $value['college'];
+            $item['city'] = $value['city'];
+            $item['mailbox'] = $value ['mailbox'];
+            $item['pictures'] = explode('|', substr($value['pictures'], 0, -1));
+            $item['video'] = $value['video'];
+            $item['create_time'] = $value['create_time'];
+            $item['video_path'] = $value['video_path'];
+            $arr[] = $item;
+        }
+
+        // 获取分页显示
+        $page = $list->render();
+        $this->assign('list', $arr);
+        $this->assign('page', $page);
+        // 渲染模板输出
+        return $this->fetch('../admin/resource:index2');
+    }
+
+    public function indexList($from = 3) {
+        $where   = [];
+        $where['post_from'] = $from;
         $request = input('request.');
 
         if (!empty($request['uid'])) { // 用户ID
