@@ -46,6 +46,7 @@ class WetchatResourceController extends AdminBaseController {
 
         // 获取分页显示
         $page = $list->render();
+        $this->assign('from', $where['post_from']);
         $this->assign('list', $arr);
         $this->assign('page', $page);
         // 渲染模板输出
@@ -87,6 +88,7 @@ class WetchatResourceController extends AdminBaseController {
 
         // 获取分页显示
         $page = $list->render();
+        $this->assign('from', $where['post_from']);
         $this->assign('list', $arr);
         $this->assign('page', $page);
         // 渲染模板输出
@@ -129,6 +131,7 @@ class WetchatResourceController extends AdminBaseController {
 
         // 获取分页显示
         $page = $list->render();
+        $this->assign('from', $where['post_from']);
         $this->assign('list', $arr);
         $this->assign('page', $page);
         // 渲染模板输出
@@ -139,43 +142,50 @@ class WetchatResourceController extends AdminBaseController {
     // 导出选手资料
     public function exportExcel() {
         $postData = Request::instance()->post('idStr');
-
+        $from = Request::instance()->post('from');
+        $field = 'id,name,phone,mailbox,city,college,pictures,video,create_time';
         if ($postData === 'all') {
-            $where['post_from'] =3;
-            $result = Db::name('user_resource')->where()->order('id desc')->select();
+            $where['post_from'] = $from ;
+            $result = Db::name('user_resource')->where($where)->field($field)->order('id desc')->select();
         } else {
             $condition = explode(',', $postData);
             array_pop($condition);
-            $result = Db::name('user_resource')->whereIn('id', $condition)->order('id desc')->select();
+            $result = Db::name('user_resource')->whereIn('id', $condition)->field($field)->order('id desc')->select();
         }
-
         $PHPExcel = new PHPExcel();
         $path = ROOT_PATH . '/public/upload/excel/';
         $PHPSheet = $PHPExcel->getActiveSheet();
         $PHPSheet->setTitle('爱奇艺超级主播全国网络主播选秀大赛');
-        $PHPSheet->getColumnDimension('A')->setWidth(20);
-        $PHPSheet->getColumnDimension('B')->setAutoSize(true);
+        $PHPSheet->getColumnDimension('A')->setAutoSize(true);
+        $PHPSheet->getColumnDimension('B')->setWidth(20);
         $PHPSheet->getColumnDimension('C')->setAutoSize(true);
+        $PHPSheet->getColumnDimension('D')->setWidth(15);
+        $PHPSheet->getColumnDimension('F')->setWidth(20);
         $PHPSheet->getColumnDimension('H')->setWidth(20);
         $PHPSheet->getColumnDimension('I')->setAutoSize(true);
+        $PHPSheet->getColumnDimension('J')->setAutoSize(true);
 
-        $PHPSheet->setCellValue('A1','姓名')
-            ->setCellValue('B1', '手机号')
-            ->setCellValue('C1', '邮箱')
-            ->setCellValue('D1', '所在城市')
-            ->setCellValue('E1', '图片1链接')
-            ->setCellValue('F1', '图片2链接')
-            ->setCellValue('G1', '图片3链接')
-            ->setCellValue('H1', '视频链接')
-            ->setCellValue('I1', '上传日期');
+        $PHPSheet->setCellValue('A1','ID')
+            ->setCellValue('B1', '姓名')
+            ->setCellValue('C1', '手机号')
+            ->setCellValue('D1', '邮箱')
+            ->setCellValue('E1', '所在城市')
+            ->setCellValue('F1', '推荐/所在院')
+            ->setCellValue('G1', '图片1链接')
+            ->setCellValue('H1', '图片2链接')
+            ->setCellValue('I1', '图片3链接')
+            ->setCellValue('J1', '视频')
+            ->setCellValue('K1', '上传日期');
+
         foreach($result as $key => $item) {
             $j = 'A';
             $key += 2;
             foreach($item as $k =>  $value) {
-                if ($k === 'id' || empty($item[$k])) {
-                    continue;
+                if (empty($item[$k])) {
+                    $PHPSheet->setCellValue($j.$key, '');
                 } elseif ($k === 'pictures') {
                     $picArr = explode('|', $value);
+                    array_pop($picArr);
                     foreach($picArr as $picKey => $picUrl) {
                         $url = 'http://cjzb.mayiban.cn/upload/' . $picUrl;
                         $picStr = '图片' . intval($picKey + 1) ;
@@ -186,7 +196,7 @@ class WetchatResourceController extends AdminBaseController {
                         $j++;
                     }
                     continue;
-                } elseif ($k === 'video'  || $k === 'video_path' ) {
+                } elseif ($k === 'video'  || $k === 'video_path') {
                     $video_url = 'http://cjzb.mayiban.cn/upload/' . $item[$k];
                     $PHPSheet->setCellValue($j.$key, '查看视频');
                     if ($k === 'video') {
@@ -207,8 +217,9 @@ class WetchatResourceController extends AdminBaseController {
             }
         }
         $objWriter = PHPExcel_IOFactory::createWriter($PHPExcel, 'Excel2007');
-        $objWriter->save($path . "superAnthor.xlsx");
-        return json(array('url' => 'http://cjzb.mayiban.cn/upload/excel/superAnthor.xlsx'));
+        $time = time();
+        $objWriter->save($path . $time . "_superAnthor.xlsx");
+        return json(array('url' => 'http://cjzb.mayiban.cn/upload/excel/'. $time .'_superAnthor.xlsx'));
     }
 
     // 删除选手资料

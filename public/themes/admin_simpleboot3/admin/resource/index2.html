@@ -27,6 +27,7 @@
         <a class="btn btn-danger" href="{:url('user/userResource/indexList')}">清空</a>
     </form>
     <form method="post" class="js-ajax-form">
+        <input type="hidden" name="from_post" id="from_post" value="{$from}">
         <table class="table table-hover table-bordered">
             <thead>
             <tr>
@@ -132,13 +133,13 @@
                     return false;
                 }
             }
-
+            var from = $('#from_post').val();
             if (idStr !== '') {
                 $.ajax({
                     type: 'post',
                     dataType: 'json',
-                    url: "{:url('user/adminResource/exportExcel')}",
-                    data: { idStr: idStr},
+                    url: "{:url('user/wetchatResource/exportExcel')}",
+                    data: { idStr: idStr, from: from},
                     beforeSend: function() {
                         $('#exportExcel').text('正在导出...').prop({disabled: true});
                     },
@@ -171,7 +172,7 @@
                     $.ajax({
                         type: 'post',
                         dataType: 'json',
-                        url: "{:url('user/adminResource/deleteAct')}",
+                        url: "{:url('user/wetchatResource/deleteAct')}",
                         data: { idStr: idStr},
                         beforeSend: function() {
                             $('#deleteAct').text('正在删除...').prop({disabled: true});

@@ -34,10 +34,10 @@ class AdminResourceController extends AdminBaseController {
             $item['id'] = $value['id'];
             $item['name'] = $value['name'];
             $item['phone'] = $value['phone'];
-	    $item['city'] = $value['city'];
+	        $item['city'] = $value['city'];
             $item['mailbox'] = $value ['mailbox'];
             //$item['pictures'] = explode('|', $value['pictures']);
-	    $item['pictures'] = explode('|', substr($value['pictures'], 0, -1));
+	        $item['pictures'] = explode('|', substr($value['pictures'], 0, -1));
             $item['video'] = $value['video'];
             $item['create_time'] = $value['create_time'];
             $item['video_path'] = $value['video_path'];
@@ -53,16 +53,14 @@ class AdminResourceController extends AdminBaseController {
     // 导出选手资料
     public function exportExcel() {
         $postData = Request::instance()->post('idStr');
-
         if ($postData === 'all') {
-            $result = Db::name('user_resource')->order('id desc')->select();
+            $result = Db::name('user_resource')->where(true)->order('id desc')->select();
         } else {
             $condition = explode(',', $postData);
             array_pop($condition);
             $result = Db::name('user_resource')->whereIn('id', $condition)->order('id desc')->select();
         }
-        
-        $PHPExcel = new PHPExcel(); 
+        $PHPExcel = new PHPExcel();
         $path = ROOT_PATH . '/public/upload/excel/'; 
         $PHPSheet = $PHPExcel->getActiveSheet(); 
         $PHPSheet->setTitle('爱奇艺超级主播全国网络主播选秀大赛');

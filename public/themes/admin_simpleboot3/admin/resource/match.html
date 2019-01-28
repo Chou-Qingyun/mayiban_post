@@ -127,7 +127,7 @@
                 $.ajax({
                     type: 'post',
                     dataType: 'json',
-                    url: "{:url('user/adminResource/exportExcel')}",
+                    url: "{:url('user/matchResource/exportExcel')}",
                     data: { idStr: idStr},
                     beforeSend: function() {
                         $('#exportExcel').text('正在导出...').prop({disabled: true});
@@ -161,7 +161,7 @@
                     $.ajax({
                         type: 'post',
                         dataType: 'json',
-                        url: "{:url('user/adminResource/deleteAct')}",
+                        url: "{:url('user/matchResource/deleteAct')}",
                         data: { idStr: idStr},
                         beforeSend: function() {
                             $('#deleteAct').text('正在删除...').prop({disabled: true});
