@@ -146,11 +146,11 @@ class WetchatResourceController extends AdminBaseController {
         $field = 'id,name,phone,mailbox,city,college,pictures,video,create_time';
         if ($postData === 'all') {
             $where['post_from'] = $from ;
-            $result = Db::name('user_resource')->where($where)->field($field)->order('id desc')->select();
+            $result = Db::name('user_resource')->where($where)->field($field)->order('id desc')->select()->toArray();
         } else {
             $condition = explode(',', $postData);
             array_pop($condition);
-            $result = Db::name('user_resource')->whereIn('id', $condition)->field($field)->order('id desc')->select();
+            $result = Db::name('user_resource')->whereIn('id', $condition)->field($field)->order('id desc')->select()->toArray();
         }
         $PHPExcel = new PHPExcel();
         $path = ROOT_PATH . '/public/upload/excel/';
@@ -228,7 +228,7 @@ class WetchatResourceController extends AdminBaseController {
         $postData = Request::instance()->post('idStr');
         $condition = explode(',', $postData);
         array_pop($condition);
-        $result = Db::name('user_resource')->whereIn('id', $condition)->order('id desc')->select();
+        $result = Db::name('user_resource')->whereIn('id', $condition)->order('id desc')->select()->toArray();
         foreach ($result as $item) {
             //删除图片
             $imgArr = explode('|', $item['pictures']);

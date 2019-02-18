@@ -54,11 +54,11 @@ class AdminResourceController extends AdminBaseController {
     public function exportExcel() {
         $postData = Request::instance()->post('idStr');
         if ($postData === 'all') {
-            $result = Db::name('user_resource')->where(true)->order('id desc')->select();
+            $result = Db::name('user_resource')->where(true)->order('id desc')->select()->toArray();
         } else {
             $condition = explode(',', $postData);
             array_pop($condition);
-            $result = Db::name('user_resource')->whereIn('id', $condition)->order('id desc')->select();
+            $result = Db::name('user_resource')->whereIn('id', $condition)->order('id desc')->select()->toArray();
         }
         $PHPExcel = new PHPExcel();
         $path = ROOT_PATH . '/public/upload/excel/'; 
@@ -118,8 +118,9 @@ class AdminResourceController extends AdminBaseController {
             }
         }
         $objWriter = PHPExcel_IOFactory::createWriter($PHPExcel, 'Excel2007');
-        $objWriter->save($path . "superAnthor.xlsx");
-        return json(array('url' => 'http://cjzb.mayiban.cn/upload/excel/superAnthor.xlsx'));
+        $time = time();
+        $objWriter->save($path . $time . "_superAnthor.xlsx");
+        return json(array('url' => 'http://cjzb.mayiban.cn/upload/excel/'. $time .'_superAnthor.xlsx'));
     }
 
     // 删除选手资料
@@ -128,7 +129,7 @@ class AdminResourceController extends AdminBaseController {
         $postData = Request::instance()->post('idStr');
         $condition = explode(',', $postData);
         array_pop($condition);
-        $result = Db::name('user_resource')->whereIn('id', $condition)->order('id desc')->select();
+        $result = Db::name('user_resource')->whereIn('id', $condition)->order('id desc')->select()->toArray();
         foreach ($result as $item) {
             //删除图片
             $imgArr = explode('|', $item['pictures']);

@@ -205,7 +205,7 @@ $configs = [
         // 数据库调试模式
         'debug'           => true,
         // 数据集返回类型
-        'resultset_type'  => '',
+        'resultset_type'  => 'collection',
         // 自动写入时间戳字段
         'auto_timestamp'  => false,
         // 时间字段取出后的默认时间格式
